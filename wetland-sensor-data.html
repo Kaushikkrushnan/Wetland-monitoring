@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wetland Sensor Data – Real-Time Feed</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #e8f5e9;
+    }
+    header {
+      background-color: #1b5e20;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .table-section {
+      padding: 20px;
+      overflow-x: auto;
+      position: relative;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #fff;
+    }
+    th, td {
+      border: 1px solid #bbb;
+      padding: 10px;
+      text-align: center;
+      font-size: 0.9em;
+    }
+    th {
+      background-color: #a5d6a7;
+      font-weight: bold;
+    }
+    td.good {
+      background-color: #c8e6c9;
+    }
+    td.warn {
+      background-color: #ffe082;
+    }
+    td.alert {
+      background-color: #ffccbc;
+    }
+    footer {
+      text-align: center;
+      padding: 15px;
+      color: #555;
+      font-size: 0.85em;
+    }
+    /* Spin animation for refresh icon */
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .spin {
+      display: inline-block;
+      animation: spin 0.6s linear;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Wetland Sensor Data – Real-Time Monitoring</h1>
+    <p>Sensor Node A1 | Live Status Feed</p>
+  </header>
+
+  <div class="table-section" style="position:relative;">
+    <div style="display:flex; justify-content:flex-end; align-items:center; gap:24px; margin-bottom:18px;">
+      <div style="font-size:0.95em; padding:0; background:none; box-shadow:none; border-radius:0;">
+        <span style="display:inline-block; width:16px; height:16px; background:#ffccbc; border-radius:50%; vertical-align:middle; margin-right:4px;"></span>
+        <span style="margin-right:10px; color:#b71c1c;">Risk</span>
+        <span style="display:inline-block; width:16px; height:16px; background:#ffe082; border-radius:50%; vertical-align:middle; margin-right:4px;"></span>
+        <span style="margin-right:10px; color:#ff6f00;">Optimal</span>
+        <span style="display:inline-block; width:16px; height:16px; background:#c8e6c9; border-radius:50%; vertical-align:middle; margin-right:4px;"></span>
+        <span style="color:#1b5e20;">Healthy</span>
+      </div>
+    </div>
+    <div style="margin-bottom:16px;">
+      <label for="wetland-select" style="font-weight:bold; margin-right:8px;">Select Wetland:</label>
+      <select id="wetland-select" onchange="updateWetlandTable()" style="padding:4px 8px; font-size:1em;">
+        <option value="Adyar">Pallikaranai Wetlands</option>
+        <option value="Muttukadu">Porur Wetland Eco Park</option>
+      </select>
+    </div>
+    <table id="wetland-table" aria-label="Wetland Sensor Data">
+      <caption>Real-Time Sensor Readings</caption>
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>Water pH</th>
+          <th>Turbidity</th>
+          <th>Air Quality (ppm)</th>
+          <th>Soil Moisture</th>
+          <th>Temperature (°C)</th>
+          <th>Water Level (cm)</th>
+        </tr>
+      </thead>
+      <tbody id="wetland-table-body">
+        <!-- Table rows will be dynamically updated -->
+      </tbody>
+    </table>
+    <!-- Centered refresh switch removed, replaced by icon in footer -->
+    <script>
+      // Example data for Tamil Nadu wetlands
+      const wetlandsData = {
+        Adyar: [
+          ["19:00", "good", "7.4", "good", "Clear", "good", "225", "good", "Moderate", "good", "27.2", "good", "13.7"],
+          ["20:00", "warn", "6.9", "warn", "Mild", "good", "250", "good", "Optimal", "good", "28.3", "good", "14.2"],
+          ["21:00", "good", "7.1", "good", "Clear", "good", "255", "good", "Healthy", "good", "28.0", "good", "14.9"],
+          ["22:00", "alert", "5.6", "alert", "Murky", "warn", "325", "warn", "Dry", "warn", "31.2", "alert", "11.7"],
+          ["23:00", "good", "7.3", "good", "Clear", "good", "230", "good", "Healthy", "good", "27.4", "good", "14.8"],
+        ],
+        Muttukadu: [
+          ["19:00", "good", "7.5", "good", "Clear", "good", "235", "good", "Moderate", "good", "27.5", "good", "13.9"],
+          ["20:00", "warn", "7.0", "warn", "Mild", "good", "255", "good", "Optimal", "good", "28.5", "good", "14.4"],
+          ["21:00", "good", "7.2", "good", "Clear", "good", "260", "good", "Healthy", "good", "28.2", "good", "15.0"],
+          ["22:00", "alert", "5.5", "alert", "Murky", "warn", "330", "warn", "Dry", "warn", "31.5", "alert", "11.6"],
+          ["23:00", "good", "7.4", "good", "Clear", "good", "240", "good", "Healthy", "good", "27.6", "good", "14.9"],
+        ],
+      };
+      function updateWetlandTable() {
+        const select = document.getElementById('wetland-select');
+        const wetland = select.value;
+        const tbody = document.getElementById('wetland-table-body');
+        tbody.innerHTML = '';
+        wetlandsData[wetland].forEach(row => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${row[0]}</td><td class="${row[1]}">${row[2]}</td><td class="${row[3]}">${row[4]}</td><td class="${row[5]}">${row[6]}</td><td class="${row[7]}">${row[8]}</td><td class="${row[9]}">${row[10]}</td><td class="${row[11]}">${row[12]}</td>`;
+          tbody.appendChild(tr);
+        });
+        // Update last sync time in footer to match last row's timestamp
+        const lastRow = wetlandsData[wetland][wetlandsData[wetland].length - 1];
+        const lastTimestamp = lastRow[0];
+        document.getElementById('last-sync-time').textContent = lastTimestamp;
+      }
+      updateWetlandTable();
+
+      // Auto refresh logic
+      let refreshInterval = null;
+      const refreshSwitch = document.getElementById('refresh-switch');
+      refreshSwitch.addEventListener('change', function() {
+        if (this.checked) {
+          refreshInterval = setInterval(updateWetlandTable, 5000);
+        } else {
+          clearInterval(refreshInterval);
+        }
+      });
+
+      // Manual refresh icon click
+      document.getElementById('refresh-icon').addEventListener('click', function() {
+        updateWetlandTable();
+        // Animate icon
+        this.classList.add('spin');
+        setTimeout(() => this.classList.remove('spin'), 600);
+      });
+    </script>
+  </div>
+
+  <footer id="last-sync-footer" style="display:flex; align-items:center; justify-content:center; gap:18px; margin-top:18px;">
+    <span>Last sync: <span id="last-sync-time">19:10</span></span>
+    <!-- Manual refresh icon -->
+    <span id="refresh-icon" title="Refresh now" style="display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:50%; background:#e0e0e0; cursor:pointer; transition:background 0.2s;">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <circle cx="10" cy="10" r="9" stroke="#388e3c" stroke-width="2" fill="none"/>
+        <path d="M15 10a5 5 0 1 1-2.5-4.33" stroke="#388e3c" stroke-width="2" fill="none"/>
+        <polygon points="15,5 15,9 11,7" fill="#388e3c"/>
+      </svg>
+    </span>
+    <!-- Key for refresh icon -->
+    <span style="font-size:0.95em;">Refresh</span>
+  </footer>
+
+</body>
+</html>
