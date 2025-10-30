@@ -1,0 +1,31 @@
+// Robust Node.js server using Express to serve wetland-sensor-data.html
+
+const express = require('express');
+const path = require('path');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Serve static files (CSS, JS, images) from the current directory
+app.use(express.static(__dirname));
+
+// Serve the wetland-sensor-data.html file at the root URL
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'wetland-sensor-data.html'), err => {
+    if (err) {
+      res.status(500).send('Error loading wetland-sensor-data.html');
+    }
+  });
+});
+
+// Graceful error handling for uncaught exceptions
+process.on('uncaughtException', err => {
+  console.error('Uncaught Exception:', err);
+});
+process.on('unhandledRejection', err => {
+  console.error('Unhandled Rejection:', err);
+});
+
+app.listen(PORT, () => {
+  console.log(`Wetland Sensor Data app running at http://localhost:${PORT}`);
+});
